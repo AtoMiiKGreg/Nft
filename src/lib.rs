@@ -1,7 +1,7 @@
 #![no_std]
 
 const ROYALTIES_MAX: u32 = 10_000;
-const MAX: u32 = 1;
+
 use core::convert::TryInto;
 elrond_wasm::imports!();
 elrond_wasm::derive_imports!();
