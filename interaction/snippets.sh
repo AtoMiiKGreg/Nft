@@ -1,8 +1,10 @@
-WALLET=wallet-owner.pem # PEM path
+WALLET="wallet-owner.pem" # PEM path
 ADDRESS=$(erdpy data load --key=address-devnet)
 DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-devnet)
 PROXY=https://devnet-gateway.elrond.com
-CHAIN_ID=D
+CHAIN_ID="D"
+WASM_PATH=output/atomiik-nft.wasm
+
 
 #string to hexa=0x$(xxd -pu <<< "arguments")
 #integer to hexa=0x$(printf '%x\n' arguments)
@@ -14,7 +16,7 @@ deploy() {
     local ROYALTIES=0x$(printf '%x\n' 5)
     local SELLING_PRICE=0x$(printf '%x\n' 1)
 
-    erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${WALLET} \
+    erdpy --verbose contract deploy --recall-nonce --bytecode=${WASM_PATH} --pem=${WALLET} \
     --gas-limit=100000000 \
     --arguments ${AMOUNT_OF_TOKENS} ${ROYALTIES} ${SELLING_PRICE} \
     --send --outfile="deploy-devnet.interaction.json" --proxy=${PROXY} --chain=${CHAIN_ID} || return
@@ -29,7 +31,7 @@ deploy() {
     echo "Smart contract address: ${ADDRESS}"
 }
 
-issueNft() {
+issueToken() {
     local TOKEN_DISPLAY_NAME=0x$(xxd -pu <<< "AtoMiiK")
     local TOKEN_TICKER=0x$(xxd -pu <<< "AMK")
 
@@ -47,13 +49,12 @@ setLocalRoles() {
 
 createNft() {
     local TOKEN_NAME=0x4e616d65 # "Name"
-    local ROYALTIES=1000 # 10%
     local URI=0x72616e647572692e636f6d # randuri.com
-    local SELLING_PRICE=0
+
 
     erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
     --gas-limit=50000000 --function="createNft" \
-    --arguments ${TOKEN_NAME} ${ROYALTIES} ${URI} ${SELLING_PRICE} \
+    --arguments ${TOKEN_NAME} ${URI}  \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
@@ -64,4 +65,18 @@ buyNft() {
     --gas-limit=10000000 --function="buyNft" \
     --arguments ${NFT_NONCE} \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
+}
+
+upgradeSC() {
+      local AMOUNT_OF_TOKENS=0x$(printf '%x\n' 10)
+      local ROYALTIES=0x$(printf '%x\n' 5)
+      local SELLING_PRICE=0x$(printf '%x\n' 1)
+
+    erdpy --verbose contract upgrade ${ADDRESS} --recall-nonce \
+        --bytecode=${WASM_PATH} \
+        --pem=${WALLET} \
+        --gas-limit=60000000 \
+        --proxy=${PROXY} --chain=${CHAIN_ID} \
+        --arguments ${AMOUNT_OF_TOKENS} ${ROYALTIES} ${SELLING_PRICE} \
+        --send || return
 }
