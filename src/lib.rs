@@ -15,7 +15,7 @@ pub struct ExampleAttributes {
 }
 
 #[elrond_wasm::contract]
-pub trait NftMinter: nft_module::NftModule + storage::StorageModule {
+pub trait NftMinter: nft_module::NftModule + storage::StorageModule + ContractBase {
     #[init]
     fn init(&self,
     image_base_cid:ManagedBuffer<Self::Api>,
@@ -32,8 +32,7 @@ pub trait NftMinter: nft_module::NftModule + storage::StorageModule {
         self.selling_price().set_if_empty(&selling_price)
     }
 
-    #[allow(clippy::too_many_arguments)]
-    #[allow(clippy::redundant_closure)]
+
     #[only_owner]
     #[endpoint(createNft)]
     fn create_nft(
