@@ -9,9 +9,6 @@ pub trait StorageModule {
 
     // storage
 
-    #[storage_mapper("imageBaseCid")]
-    fn image_base_cid(&self) -> SingleValueMapper<Self::Api,ManagedBuffer<Self::Api>>;
-
     #[storage_mapper("amountOfTokensTotal")]
     fn amount_of_tokens_total(&self) -> SingleValueMapper<Self::Api,u32>;
 

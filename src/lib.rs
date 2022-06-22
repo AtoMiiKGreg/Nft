@@ -15,10 +15,9 @@ pub struct ExampleAttributes {
 }
 
 #[elrond_wasm::contract]
-pub trait NftMinter: nft_module::NftModule + storage::StorageModule + ContractBase {
+pub trait NftMinter: nft_module::NftModule + storage::StorageModule {
     #[init]
     fn init(&self,
-    image_base_cid:ManagedBuffer<Self::Api>,
     amount_of_tokens:u32,
     royalties:BigUint<Self::Api>,
     selling_price:BigUint<Self::Api>) {
@@ -26,7 +25,6 @@ pub trait NftMinter: nft_module::NftModule + storage::StorageModule + ContractBa
         require!(royalties <= ROYALTIES_MAX,"royalties cannot exceed 100%!");
         require!(amount_of_tokens >= 1, "amount of tokens to mint should be at least 1!");
 
-        self.image_base_cid().set_if_empty(&image_base_cid);
         self.amount_of_tokens_total().set_if_empty(&amount_of_tokens);
         self.royalties().set_if_empty(&royalties);
         self.selling_price().set_if_empty(&selling_price)
