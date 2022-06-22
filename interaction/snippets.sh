@@ -30,17 +30,17 @@ deploy() {
 }
 
 issueNft() {
-    local TOKEN_DISPLAY_NAME=0x4d79546573744e667464  # "MyTestNft"
-    local TOKEN_TICKER=0x544553544e4654  # "TESTNFT"
+    local TOKEN_DISPLAY_NAME=0x$(xxd -pu <<< "AtoMiiK")
+    local TOKEN_TICKER=0x$(xxd -pu <<< "AMK")
 
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET.PEM} \
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
     --gas-limit=100000000 --value=50000000000000000 --function="issueToken" \
     --arguments ${TOKEN_DISPLAY_NAME} ${TOKEN_TICKER} \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 setLocalRoles() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET.PEM} \
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
     --gas-limit=100000000 --function="setLocalRoles" \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
@@ -51,7 +51,7 @@ createNft() {
     local URI=0x72616e647572692e636f6d # randuri.com
     local SELLING_PRICE=0
 
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET.PEM} \
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
     --gas-limit=50000000 --function="createNft" \
     --arguments ${TOKEN_NAME} ${ROYALTIES} ${URI} ${SELLING_PRICE} \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
@@ -60,7 +60,7 @@ createNft() {
 buyNft() {
     local NFT_NONCE=1
 
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET.PEM} \
+    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
     --gas-limit=10000000 --function="buyNft" \
     --arguments ${NFT_NONCE} \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
