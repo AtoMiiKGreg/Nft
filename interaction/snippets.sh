@@ -48,13 +48,13 @@ setLocalRoles() {
 }
 
 createNft() {
-    local TOKEN_NAME=0x4e616d65 # "Name"
-    local URI=0x72616e647572692e636f6d # randuri.com
+    local TOKEN_NAME=0x$(xxd -pu <<< "Resto") # "Name"
+    local URI=0x$(xxd -pu <<< "https://gateway.pinata.cloud/ipfs/QmcyvTGCbPEYbyNvUvx7STSJsoniSqxcx1KGafqcxkZG4Z/5FAF8AA0-CB98-4653-8B96-92C245998A44_1_105_c.jpeg") # randuri.com
 
 
     erdpy --verbose contract call "${ADDRESS}" --recall-nonce --pem=${WALLET} \
     --gas-limit=50000000 --function="createNft" \
-    --arguments ${TOKEN_NAME} ${URI}  \
+    --arguments "${TOKEN_NAME}" "${URI}"  \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
