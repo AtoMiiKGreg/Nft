@@ -29,9 +29,6 @@ pub trait NftModule : storage::StorageModule  {
         require!(self.nft_token_id().is_empty(), "Token already issued");
         require!(self.amount_of_tokens_total().get() >= 1, "Amount of tokens total should be greater than 0");
 
-        let nonce_total_nft = self.amount_of_tokens_total().get();
-        self.tokens_left_to_mint().set_initial_len(nonce_total_nft as usize);
-
 
         let payment_amount = self.call_value().egld_value();
         self.send()
@@ -151,6 +148,8 @@ pub trait NftModule : storage::StorageModule  {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
                 self.nft_token_id().set(&token_id.unwrap_esdt());
+                let nonce_total_nft = self.amount_of_tokens_total().get();
+                self.tokens_left_to_mint().set_initial_len(nonce_total_nft as usize);
             },
             ManagedAsyncCallResult::Err(_) => {
                 let caller = self.blockchain().get_owner_address();

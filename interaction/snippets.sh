@@ -18,31 +18,31 @@ deploy() {
 
     erdpy --verbose contract deploy --recall-nonce --bytecode=${WASM_PATH} --pem=${WALLET} \
     --gas-limit=100000000 \
-    --arguments ${AMOUNT_OF_TOKENS} ${ROYALTIES} ${SELLING_PRICE} \
+    --arguments "${AMOUNT_OF_TOKENS}" "${ROYALTIES}" "${SELLING_PRICE}" \
     --send --outfile="deploy-devnet.interaction.json" --proxy=${PROXY} --chain=${CHAIN_ID} || return
 
     TRANSACTION=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['emittedTransactionHash']")
     ADDRESS=$(erdpy data parse --file="deploy-devnet.interaction.json" --expression="data['contractAddress']")
 
-    erdpy data store --key=address-devnet --value=${ADDRESS}
-    erdpy data store --key=deployTransaction-devnet --value=${TRANSACTION}
+    erdpy data store --key=address-devnet --value="${ADDRESS}"
+    erdpy data store --key=deployTransaction-devnet --value="${TRANSACTION}"
 
     echo ""
     echo "Smart contract address: ${ADDRESS}"
 }
 
 issueToken() {
-    local TOKEN_DISPLAY_NAME=0x$(xxd -pu <<< "AtoMiiK")
-    local TOKEN_TICKER=0x$(xxd -pu <<< "AMK")
+    local TOKEN_DISPLAY_NAME=AtoMiiK
+    local TOKEN_TICKER=AMK
 
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
+    erdpy --verbose contract call "${ADDRESS}" --recall-nonce --pem=${WALLET} \
     --gas-limit=100000000 --value=50000000000000000 --function="issueToken" \
-    --arguments ${TOKEN_DISPLAY_NAME} ${TOKEN_TICKER} \
+    --arguments str:${TOKEN_DISPLAY_NAME} str:${TOKEN_TICKER} \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 setLocalRoles() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
+    erdpy --verbose contract call "${ADDRESS}" --recall-nonce --pem=${WALLET} \
     --gas-limit=100000000 --function="setLocalRoles" \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
@@ -52,7 +52,7 @@ createNft() {
     local URI=0x72616e647572692e636f6d # randuri.com
 
 
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
+    erdpy --verbose contract call "${ADDRESS}" --recall-nonce --pem=${WALLET} \
     --gas-limit=50000000 --function="createNft" \
     --arguments ${TOKEN_NAME} ${URI}  \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
@@ -61,7 +61,7 @@ createNft() {
 buyNft() {
     local NFT_NONCE=1
 
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${WALLET} \
+    erdpy --verbose contract call "${ADDRESS}" --recall-nonce --pem=${WALLET} \
     --gas-limit=10000000 --function="buyNft" \
     --arguments ${NFT_NONCE} \
     --send --proxy=${PROXY} --chain=${CHAIN_ID}
@@ -72,7 +72,7 @@ upgradeSC() {
       local ROYALTIES=0x$(printf '%x\n' 5)
       local SELLING_PRICE=0x$(printf '%x\n' 1)
 
-    erdpy --verbose contract upgrade ${ADDRESS} --recall-nonce \
+    erdpy --verbose contract upgrade "${ADDRESS}" --recall-nonce \
         --bytecode=${WASM_PATH} \
         --pem=${WALLET} \
         --gas-limit=60000000 \
